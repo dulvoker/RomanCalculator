@@ -243,20 +243,6 @@ Node* postfixToBinaryExpressionTree(const vector<string>& postfix) {
 
 /* end */
 
-string readInput() {
-    string rawEquation;
-    cout << "Enter Expression :\n";
-    char c;
-    do {
-        c = getchar();
-        if(c != '\n'){
-            rawEquation += c;
-        }
-    } while (c != '\n');
-
-    return rawEquation;
-}
-
 string removeSpaces(string equation) {
     string new_word;
     for (unsigned int i = 0; i < equation.size(); i++) {
@@ -354,23 +340,20 @@ vector<string> convertRomanTokensToInts(const vector<string>& tokens) {
 }
 
 int main() {
-    string rawEquation = readInput();
-    string spacelessEquation = removeSpaces(rawEquation);
-    vector<string> tokens = tokenize(spacelessEquation);
+    for (string line; getline(cin, line);) {
+        const string& rawEquation = line;
 
-    tokens = convertRomanTokensToInts(tokens);
+        string spacelessEquation = removeSpaces(rawEquation);
+        vector<string> tokens = tokenize(spacelessEquation);
 
-    for (const string& token: tokens) {
-        cout << "[ " << token << " ],";
+        tokens = convertRomanTokensToInts(tokens);
+
+        vector<string> postfix = infixToPostfix(tokens);
+
+        Node* root = postfixToBinaryExpressionTree(postfix);
+
+        cout << root->evaluate() << endl;
     }
-
-    cout << endl;
-
-    vector<string> postfix = infixToPostfix(tokens);
-
-    Node* root = postfixToBinaryExpressionTree(postfix);
-
-    cout << "result = " << root->evaluate() << endl;
 
     return 0;
 }
