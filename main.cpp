@@ -330,14 +330,14 @@ vector<string> convertRomanTokensToInts(const vector<string>& tokens) {
     vector<string> result;
 
     for (string token: tokens) {
+        if (token[0] == '-' && token.size() > 1) {
+            int intRoman = romanToInt(token);
+            result.push_back(to_string(intRoman));
+            continue;
+        }
         switch (token[0]) {
             case '+':
             case '-':
-                if (token.size() > 1) {
-                    int intRoman = romanToInt(token);
-                    result.push_back(to_string(intRoman));
-                    continue;
-                }
             case '*':
             case '/':
             case '(':
