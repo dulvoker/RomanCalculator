@@ -267,6 +267,18 @@ string removeSpaces(string equation) {
     return new_word;
 }
 
+bool isOperationChar(string character) {
+    switch (character[0]) {
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+            return true;
+    }
+
+    return false;
+}
+
 vector<string> tokenize(string rawEquation) {
     vector<string> tokens;
     string temp;
@@ -275,8 +287,21 @@ vector<string> tokenize(string rawEquation) {
         char currentChar = rawEquation[i];
 
         switch (currentChar) {
-            case '+':
             case '-':
+                // на случай унарного минуса
+                // for unary minus cases
+                if (i == 0) {
+                    temp = "-";
+                    continue;
+                }
+                if (i > 0 && !tokens.empty()) {
+                    if (isOperationChar(tokens.back()) ||
+                    tokens.back() == "(") {
+                        temp = "-";
+                        continue;
+                    }
+                }
+            case '+':
             case '*':
             case '/':
             case '(':
@@ -307,6 +332,11 @@ vector<string> convertRomanTokensToInts(const vector<string>& tokens) {
         switch (token[0]) {
             case '+':
             case '-':
+                if (token.size() > 1) {
+                    int intRoman = romanToInt(token);
+                    result.push_back(to_string(intRoman));
+                    continue;
+                }
             case '*':
             case '/':
             case '(':
