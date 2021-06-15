@@ -67,11 +67,7 @@ vector<string> infixToPostfix(const vector<string>& infix) {
 
 /* end */
 
-vector<std::string> to_evaluate;
-
-/* parser */
-
-string printRoman(int number)
+string intToRoman(int number)
 {
     int num[] = {1,4,5,9,10,40,50,90,100,400,500,900,1000};
     string sym[] = {"I","IV","V","IX","X","XL","L","XC","C","CD","D","CM","M"};
@@ -90,10 +86,19 @@ string printRoman(int number)
     return word;
 }
 
-pair<int,bool> solution(string roman) {
+int romanToInt(string roman) {
     int sum = 0;
     int i = 0;
+    bool isNegative = false;
+
+    if (roman[0] == '-') {
+        isNegative = true;
+        ++i;
+    }
+
     while (roman[i] != '\0') {
+        if (roman[i] == 'Z') return 0;
+
         if(roman[i] == 'I'){
             sum = sum + 1;
         }
@@ -134,55 +139,23 @@ pair<int,bool> solution(string roman) {
             sum = sum + 1000;
         }
         else {
-            return make_pair(0,false);
+            throw std::runtime_error("Invalid roman: " + roman);
         }
         i++;
     }
-    if (roman != printRoman(sum)) {
-        return make_pair(0,false);
-    }
-    return make_pair(sum,true);
-}
 
-bool digitize(string equation) {
-    string temp;
-    int opening_braces = 0;
-    int closing_braces = 0;
-    for (unsigned int i = 0; i < equation.size(); i++) {
-        temp.push_back(equation[i]);
-        if (equation[i] == '+' || equation[i] == '-' || equation[i] == '*' || equation[i] == '/' || equation[i] == '(' || equation[i] == ')' || i + 1 == equation.size()) {
-            if (equation[i] == '(') {
-                opening_braces++;
-            }
-            if (equation[i] == ')') {
-                closing_braces++;
-            }
-            temp.pop_back();
-            if (!temp.empty()) {
-                to_evaluate.push_back(temp);
-            }
-            temp.clear();
-            temp.push_back(equation[i]);
-            to_evaluate.push_back(temp);
-            temp.clear();
+    if (isNegative) {
+        if (roman.substr(1) != intToRoman(sum)) {
+            throw std::runtime_error("Invalid roman: " + roman);
+        }
+    } else {
+        if (roman != intToRoman(sum)) {
+            throw std::runtime_error("Invalid roman: " + roman);
         }
     }
-    for (auto & each : to_evaluate) {
-        if (each.size() != 1) {
-            if (!(solution(each).second)) {
-                return false;
-            }
-            each = to_string(solution(each).first);
-        }
-    }
-    if (opening_braces != closing_braces) {
-        cout << endl << "Error ( Inappropriate braces! )" << endl;
-        return false;
-    }
-    return true;
-}
 
-/* end */
+    return isNegative ? -sum : sum;
+}
 
 /* Node class */
 
@@ -211,7 +184,7 @@ public:
     int evaluate() {
         if (this->isOperation) {
             int leftVal = this->left->evaluate(),
-                rightVal = this->right->evaluate();
+                    rightVal = this->right->evaluate();
 
             switch (this->operationType[0]) {
                 case '+':
@@ -221,6 +194,14 @@ public:
                 case '*':
                     return leftVal * rightVal;
                 case '/':
+                    if (rightVal == 0) {
+                        throw std::runtime_error("Can't delete by 0");
+                    }
+
+                    if (leftVal % rightVal != 0) {
+                        throw std::runtime_error("Can't divide " + intToRoman(leftVal) + " by " + intToRoman(rightVal));
+                    }
+
                     return leftVal / rightVal;
             }
         }
@@ -244,10 +225,10 @@ Node* postfixToBinaryExpressionTree(const vector<string>& postfix) {
         } else {
             Node* node = new Node(item);
 
-            Node* leftNode = localStack.top();
+            Node* rightNode = localStack.top();
             localStack.pop();
 
-            Node* rightNode = localStack.top();
+            Node* leftNode = localStack.top();
             localStack.pop();
 
             node->left = leftNode;
@@ -319,33 +300,46 @@ vector<string> tokenize(string rawEquation) {
     return tokens;
 }
 
-int main() {
+vector<string> convertRomanTokensToInts(const vector<string>& tokens) {
+    vector<string> result;
 
+    for (string token: tokens) {
+        switch (token[0]) {
+            case '+':
+            case '-':
+            case '*':
+            case '/':
+            case '(':
+            case ')':
+                result.push_back(token);
+                continue;
+        }
+
+        int intRoman = romanToInt(token);
+        result.push_back(to_string(intRoman));
+    }
+
+    return result;
+}
+
+int main() {
     string rawEquation = readInput();
     string spacelessEquation = removeSpaces(rawEquation);
     vector<string> tokens = tokenize(spacelessEquation);
+
+    tokens = convertRomanTokensToInts(tokens);
 
     for (const string& token: tokens) {
         cout << "[ " << token << " ],";
     }
 
-    /*
-    digitize(rawEquation);
+    cout << endl;
 
-    vector<string> postfix = infixToPostfix(to_evaluate);
-
-    cout << "[";
-    for (string &item : postfix) {
-        cout << item << ", ";
-    } cout << "]" << endl;
-
-    cout << "here?" << endl;
+    vector<string> postfix = infixToPostfix(tokens);
 
     Node* root = postfixToBinaryExpressionTree(postfix);
 
     cout << "result = " << root->evaluate() << endl;
-
-    */
 
     return 0;
 }
