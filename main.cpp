@@ -69,6 +69,13 @@ vector<string> infixToPostfix(const vector<string>& infix) {
 
 string intToRoman(int number)
 {
+    bool isNegative = false;
+
+    if (number < 0) {
+        isNegative = true;
+        number *= -1;
+    }
+
     int num[] = {1,4,5,9,10,40,50,90,100,400,500,900,1000};
     string sym[] = {"I","IV","V","IX","X","XL","L","XC","C","CD","D","CM","M"};
     int i=12;
@@ -83,7 +90,7 @@ string intToRoman(int number)
         }
         i--;
     }
-    return word;
+    return isNegative ? "-" + word : word;
 }
 
 int romanToInt(string roman) {
@@ -341,18 +348,22 @@ vector<string> convertRomanTokensToInts(const vector<string>& tokens) {
 
 int main() {
     for (string line; getline(cin, line);) {
-        const string& rawEquation = line;
+        try {
+            const string& rawEquation = line;
 
-        string spacelessEquation = removeSpaces(rawEquation);
-        vector<string> tokens = tokenize(spacelessEquation);
+            string spacelessEquation = removeSpaces(rawEquation);
+            vector<string> tokens = tokenize(spacelessEquation);
 
-        tokens = convertRomanTokensToInts(tokens);
+            tokens = convertRomanTokensToInts(tokens);
 
-        vector<string> postfix = infixToPostfix(tokens);
+            vector<string> postfix = infixToPostfix(tokens);
 
-        Node* root = postfixToBinaryExpressionTree(postfix);
+            Node* root = postfixToBinaryExpressionTree(postfix);
 
-        cout << root->evaluate() << endl;
+            cout << intToRoman(root->evaluate()) << endl;
+        } catch (exception& ex) {
+            cout << "error: " + string(ex.what()) << endl;
+        }
     }
 
     return 0;
