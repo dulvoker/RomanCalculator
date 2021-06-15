@@ -144,28 +144,18 @@ pair<int,bool> solution(string roman) {
     return make_pair(sum,true);
 }
 
-string no_space(string equation) {
-    string new_word;
-    for (unsigned int i = 0; i < equation.size(); i++) {
-        if (equation[i] != 32) {
-            new_word += equation[i];
-        }
-    }
-    return new_word;
-};
-
 bool digitize(string equation) {
     string temp;
-    int open_braces = 0;
-    int end_braces = 0;
-    for (int i = 0; i < equation.size(); i++) {
+    int opening_braces = 0;
+    int closing_braces = 0;
+    for (unsigned int i = 0; i < equation.size(); i++) {
         temp.push_back(equation[i]);
         if (equation[i] == '+' || equation[i] == '-' || equation[i] == '*' || equation[i] == '/' || equation[i] == '(' || equation[i] == ')' || i + 1 == equation.size()) {
             if (equation[i] == '(') {
-                open_braces++;
+                opening_braces++;
             }
             if (equation[i] == ')') {
-                end_braces++;
+                closing_braces++;
             }
             temp.pop_back();
             if (!temp.empty()) {
@@ -185,7 +175,7 @@ bool digitize(string equation) {
             each = to_string(solution(each).first);
         }
     }
-    if (open_braces != end_braces) {
+    if (opening_braces != closing_braces) {
         cout << endl << "Error ( Inappropriate braces! )" << endl;
         return false;
     }
@@ -272,23 +262,75 @@ Node* postfixToBinaryExpressionTree(const vector<string>& postfix) {
 
 /* end */
 
-int main() {
-    string equation;
+string readInput() {
+    string rawEquation;
     cout << "Enter Expression :\n";
     char c;
     do {
         c = getchar();
         if(c != '\n'){
-            equation += c;
+            rawEquation += c;
         }
     } while (c != '\n');
-    equation = no_space(equation);
-    if (digitize(equation)) {
-        for (string &every : to_evaluate) {
-            cout << "[" << every << "] ";
+
+    return rawEquation;
+}
+
+string removeSpaces(string equation) {
+    string new_word;
+    for (unsigned int i = 0; i < equation.size(); i++) {
+        if (equation[i] != 32) {
+            new_word += equation[i];
         }
     }
-    cout << endl;
+    return new_word;
+}
+
+vector<string> tokenize(string rawEquation) {
+    vector<string> tokens;
+    string temp;
+
+    for (int i = 0; i < rawEquation.size(); ++i) {
+        char currentChar = rawEquation[i];
+
+        switch (currentChar) {
+            case '+':
+            case '-':
+            case '*':
+            case '/':
+            case '(':
+            case ')':
+                if (!temp.empty()) {
+                    tokens.push_back(temp);
+                    temp.clear();
+                }
+
+                tokens.push_back(string(1, currentChar));
+                continue;
+        }
+
+        temp.push_back(currentChar);
+    }
+
+    if (!temp.empty()) {
+        tokens.push_back(temp);
+    }
+
+    return tokens;
+}
+
+int main() {
+
+    string rawEquation = readInput();
+    string spacelessEquation = removeSpaces(rawEquation);
+    vector<string> tokens = tokenize(spacelessEquation);
+
+    for (const string& token: tokens) {
+        cout << "[ " << token << " ],";
+    }
+
+    /*
+    digitize(rawEquation);
 
     vector<string> postfix = infixToPostfix(to_evaluate);
 
@@ -302,5 +344,8 @@ int main() {
     Node* root = postfixToBinaryExpressionTree(postfix);
 
     cout << "result = " << root->evaluate() << endl;
+
+    */
+
     return 0;
 }
