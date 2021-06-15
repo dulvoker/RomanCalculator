@@ -294,12 +294,10 @@ vector<string> tokenize(string rawEquation) {
                     temp = "-";
                     continue;
                 }
-                if (i > 0 && !tokens.empty()) {
-                    if (isOperationChar(tokens.back()) ||
-                    tokens.back() == "(") {
-                        temp = "-";
-                        continue;
-                    }
+                if (i > 0 && !tokens.empty() &&
+                    (isOperationChar(tokens.back()) || tokens.back() == "(")) {
+                    temp = "-";
+                    continue;
                 }
             case '+':
             case '*':
