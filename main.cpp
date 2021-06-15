@@ -286,19 +286,22 @@ vector<string> tokenize(string rawEquation) {
     for (size_t i = 0; i < rawEquation.size(); ++i) {
         char currentChar = rawEquation[i];
 
+        if (currentChar == '-') {
+            if (i == 0) {
+                temp = "-";
+                continue;
+            }
+            if (i > 0 && !tokens.empty() &&
+                (isOperationChar(tokens.back()) || tokens.back() == "(")) {
+                temp = "-";
+                continue;
+            }
+        }
+
         switch (currentChar) {
             case '-':
                 // на случай унарного минуса
                 // for unary minus cases
-                if (i == 0) {
-                    temp = "-";
-                    continue;
-                }
-                if (i > 0 && !tokens.empty() &&
-                    (isOperationChar(tokens.back()) || tokens.back() == "(")) {
-                    temp = "-";
-                    continue;
-                }
             case '+':
             case '*':
             case '/':
