@@ -283,7 +283,7 @@ vector<string> tokenize(string rawEquation) {
     vector<string> tokens;
     string temp;
 
-    for (int i = 0; i < rawEquation.size(); ++i) {
+    for (size_t i = 0; i < rawEquation.size(); ++i) {
         char currentChar = rawEquation[i];
 
         switch (currentChar) {
