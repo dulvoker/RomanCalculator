@@ -254,17 +254,9 @@ Node* postfixToBinaryExpressionTree(const vector<string>& postfix) {
 
 /* end */
 
-string removeSpaces(string equation) {
-    string new_word;
-    for (unsigned int i = 0; i < equation.size(); i++) {
-        if (equation[i] != 32) {
-            new_word += equation[i];
-        }
-    }
-    return new_word;
-}
+/* validation */
 
-bool isOperationChar(string character) {
+bool isOperationToken(string character) {
     if (character.size() != 1) {
         return false;
     }
@@ -279,9 +271,27 @@ bool isOperationChar(string character) {
     return false;
 }
 
+string removeSpaces(string equation) {
+    string new_word;
+    for (unsigned int i = 0; i < equation.size(); i++) {
+        if (equation[i] != 32) {
+            new_word += equation[i];
+        }
+    }
+    return new_word;
+}
+
 vector<string> tokenize(string rawEquation) {
     vector<string> tokens;
     string temp;
+
+    temp.push_back(rawEquation[0]);
+
+    if (isOperationToken(temp) && rawEquation[0] != '-') {
+        throw std::logic_error("Invalid operations");
+    }
+
+    temp.clear();
 
     for (size_t i = 0; i < rawEquation.size(); ++i) {
         char currentChar = rawEquation[i];
@@ -291,7 +301,7 @@ vector<string> tokenize(string rawEquation) {
                 continue;
             }
             if (i > 0 && !tokens.empty() &&
-                (isOperationChar(tokens.back()) || tokens.back() == "(")) {
+                (isOperationToken(tokens.back()) || tokens.back() == "(")) {
                 temp = "-";
                 continue;
             }
@@ -369,13 +379,13 @@ void validateEquation(const vector<string>& tokens) {
             closingBraces++;
         }
 
-        if (isOperationChar(currentToken) && i!=0 &&
-            isOperationChar(tokens[i + 1]) &&
+        if (isOperationToken(currentToken) && i != 0 &&
+            isOperationToken(tokens[i + 1]) &&
             tokens[i+1][0] != '-') {
             throw std::logic_error("Invalid operations");
         }
 
-        if (isOperationChar(currentToken) && i == tokens.size()-1) {
+        if (isOperationToken(currentToken) && i == tokens.size() - 1) {
             throw std::logic_error("Invalid operations");
         }
     }
@@ -386,6 +396,8 @@ void validateEquation(const vector<string>& tokens) {
               std::logic_error("You have more closing brace");
     }
 }
+
+/* end */
 
 int main() {
     for (string line; getline(cin, line);) {
