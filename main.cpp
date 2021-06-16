@@ -265,6 +265,9 @@ string removeSpaces(string equation) {
 }
 
 bool isOperationChar(string character) {
+    if (character.size() != 1) {
+        return false;
+    }
     switch (character[0]) {
         case '+':
         case '-':
@@ -282,8 +285,7 @@ vector<string> tokenize(string rawEquation) {
 
     for (size_t i = 0; i < rawEquation.size(); ++i) {
         char currentChar = rawEquation[i];
-
-        if (currentChar == '-') {
+        if (currentChar == '-' && temp.empty()) {
             if (i == 0) {
                 temp = "-";
                 continue;
@@ -367,12 +369,15 @@ void validateEquation(const vector<string>& tokens) {
             closingBraces++;
         }
 
-//        if (isOperationChar(currentToken) &&
-//            isOperationChar(tokens[i + 1]) &&
-//            tokens[i+1][0] != '-') {
-//            throw std::logic_error("Invalid operations");
-//        }
+        if (isOperationChar(currentToken) && i!=0 &&
+            isOperationChar(tokens[i + 1]) &&
+            tokens[i+1][0] != '-') {
+            throw std::logic_error("Invalid operations");
+        }
 
+        if (isOperationChar(currentToken) && i == tokens.size()-1) {
+            throw std::logic_error("Invalid operations");
+        }
     }
 
     if (openingBraces != closingBraces) {
