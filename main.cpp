@@ -279,6 +279,8 @@ bool isOperationChar(string character) {
 vector<string> tokenize(string rawEquation) {
     vector<string> tokens;
     string temp;
+    int opening_braces = 0,
+        closing_braces = 0;
 
     for (size_t i = 0; i < rawEquation.size(); ++i) {
         char currentChar = rawEquation[i];
@@ -293,6 +295,13 @@ vector<string> tokenize(string rawEquation) {
                 temp = "-";
                 continue;
             }
+        }
+
+        if (currentChar == '(') {
+            opening_braces++;
+        }
+        if (currentChar == ')') {
+            closing_braces++;
         }
 
         switch (currentChar) {
@@ -318,6 +327,11 @@ vector<string> tokenize(string rawEquation) {
 
     if (!temp.empty()) {
         tokens.push_back(temp);
+    }
+
+    if (opening_braces != closing_braces) {
+        throw opening_braces > closing_braces ?  std::logic_error("You have an excess opening brace") :
+        std::logic_error("You have an excess closing brace");
     }
 
     return tokens;
