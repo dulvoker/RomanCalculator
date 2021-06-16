@@ -323,38 +323,6 @@ vector<string> tokenize(string rawEquation) {
     return tokens;
 }
 
-void validateEquation(const vector<string>& tokens) {
-    vector<string> valid_tokens;
-
-    int opening_braces = 0,
-        closing_braces = 0;
-
-    for (size_t i = 0; i < tokens.size(); i++) {
-
-        string current_token = tokens[i];
-
-        if (current_token == "(") {
-            opening_braces++;
-        }
-        if (current_token == ")") {
-            closing_braces++;
-        }
-
-        if (isOperationChar(current_token) &&
-            isOperationChar(tokens[i+1]) &&
-            tokens[i+1][0] != '-') {
-            throw std::logic_error("Invalid operations");
-        }
-
-    }
-
-    if (opening_braces != closing_braces) {
-        throw opening_braces > closing_braces ?
-        std::logic_error("You have an excess opening brace") :
-        std::logic_error("You have an excess closing brace");
-    }
-}
-
 vector<string> convertRomanTokensToInts(const vector<string>& tokens) {
     vector<string> result;
 
@@ -380,6 +348,38 @@ vector<string> convertRomanTokensToInts(const vector<string>& tokens) {
     }
 
     return result;
+}
+
+void validateEquation(const vector<string>& tokens) {
+    vector<string> valid_tokens;
+
+    int openingBraces = 0,
+            closingBraces = 0;
+
+    for (size_t i = 0; i < tokens.size(); i++) {
+
+        string currentToken = tokens[i];
+
+        if (currentToken == "(") {
+            openingBraces++;
+        }
+        if (currentToken == ")") {
+            closingBraces++;
+        }
+
+//        if (isOperationChar(currentToken) &&
+//            isOperationChar(tokens[i + 1]) &&
+//            tokens[i+1][0] != '-') {
+//            throw std::logic_error("Invalid operations");
+//        }
+
+    }
+
+    if (openingBraces != closingBraces) {
+        throw openingBraces > closingBraces ?
+              std::logic_error("You have more opening brace") :
+              std::logic_error("You have more closing brace");
+    }
 }
 
 int main() {
