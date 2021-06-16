@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.17)
-project(codewars_2_0)
+project(roman_calculator)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(codewars_2_0 main.cpp)
+add_executable(roman_calculator main.cpp)
