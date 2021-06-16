@@ -9,3 +9,6 @@ X - X - X - X
 V * -X
 V / V - III
 -III * M
+V ++ X
+V +- I
+M // I
