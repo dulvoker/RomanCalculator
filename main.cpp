@@ -69,6 +69,10 @@ vector<string> infixToPostfix(const vector<string>& infix) {
 
 string intToRoman(int number)
 {
+    if (number == 0) {
+        return "Z";
+    }
+
     bool isNegative = false;
 
     if (number < 0) {
