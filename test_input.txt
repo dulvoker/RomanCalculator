@@ -1,3 +1,11 @@
-V + V
 V - X
 V / Z
+V + V
+(V + XI))
+V + XI
+V * V / X - X
+X * X * X
+X - X - X - X
+V * -X
+V / V - III
+-III * M
