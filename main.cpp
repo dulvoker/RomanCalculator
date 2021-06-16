@@ -279,8 +279,6 @@ bool isOperationChar(string character) {
 vector<string> tokenize(string rawEquation) {
     vector<string> tokens;
     string temp;
-    int opening_braces = 0,
-        closing_braces = 0;
 
     for (size_t i = 0; i < rawEquation.size(); ++i) {
         char currentChar = rawEquation[i];
@@ -295,13 +293,6 @@ vector<string> tokenize(string rawEquation) {
                 temp = "-";
                 continue;
             }
-        }
-
-        if (currentChar == '(') {
-            opening_braces++;
-        }
-        if (currentChar == ')') {
-            closing_braces++;
         }
 
         switch (currentChar) {
@@ -329,12 +320,39 @@ vector<string> tokenize(string rawEquation) {
         tokens.push_back(temp);
     }
 
-    if (opening_braces != closing_braces) {
-        throw opening_braces > closing_braces ?  std::logic_error("You have an excess opening brace") :
-        std::logic_error("You have an excess closing brace");
+    return tokens;
+}
+
+void validateEquation(const vector<string>& tokens) {
+    vector<string> valid_tokens;
+
+    int opening_braces = 0,
+        closing_braces = 0;
+
+    for (size_t i = 0; i < tokens.size(); i++) {
+
+        string current_token = tokens[i];
+
+        if (current_token == "(") {
+            opening_braces++;
+        }
+        if (current_token == ")") {
+            closing_braces++;
+        }
+
+        if (isOperationChar(current_token) &&
+            isOperationChar(tokens[i+1]) &&
+            tokens[i+1][0] != '-') {
+            throw std::logic_error("Invalid operations");
+        }
+
     }
 
-    return tokens;
+    if (opening_braces != closing_braces) {
+        throw opening_braces > closing_braces ?
+        std::logic_error("You have an excess opening brace") :
+        std::logic_error("You have an excess closing brace");
+    }
 }
 
 vector<string> convertRomanTokensToInts(const vector<string>& tokens) {
@@ -371,6 +389,8 @@ int main() {
 
             string spacelessEquation = removeSpaces(rawEquation);
             vector<string> tokens = tokenize(spacelessEquation);
+
+            validateEquation(tokens);
 
             tokens = convertRomanTokensToInts(tokens);
 
