@@ -209,10 +209,6 @@ public:
                         throw std::runtime_error("Can't delete by 0");
                     }
 
-//                    if (leftVal % rightVal != 0) {
-//                        throw std::runtime_error("Can't divide " + intToRoman(leftVal) + " by " + intToRoman(rightVal));
-//                    }
-
                     return leftVal / rightVal;
             }
         }
