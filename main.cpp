@@ -3,6 +3,7 @@
 #include <utility>
 #include <vector>
 #include <stack>
+#include <chrono>
 
 using namespace std;
 
@@ -63,6 +64,42 @@ vector<string> infixToPostfix(const vector<string>& infix) {
     }
 
     return postfix;
+}
+
+int evaluatePostfix(const vector<string>& postfix) {
+    stack<int> localStack;
+
+    for (string token : postfix) {
+        if (isNumber(token)) {
+            localStack.push(stoi(token));
+        } else {
+            int theLastOne = localStack.top();
+            localStack.pop();
+            int thePrevOfLastOne = localStack.top();
+            localStack.pop();
+
+            int temp;
+
+            switch (token[0]) {
+                case '*' :
+                    temp = theLastOne * thePrevOfLastOne;
+                    break;
+                case '/' :
+                    temp = thePrevOfLastOne / theLastOne;
+                    break;
+                case '+':
+                    temp = thePrevOfLastOne + theLastOne;
+                    break;
+                case '-' :
+                    temp = thePrevOfLastOne - theLastOne;
+                    break;
+            }
+
+            localStack.push(temp);
+        }
+    }
+
+    return localStack.top();
 }
 
 /* end */
@@ -206,7 +243,7 @@ public:
                     return leftVal * rightVal;
                 case '/':
                     if (rightVal == 0) {
-                        throw std::runtime_error("Can't delete by 0");
+                        throw std::runtime_error("Can't divide by 0");
                     }
 
                     return leftVal / rightVal;
@@ -395,17 +432,59 @@ void validateEquation(const vector<string>& tokens) {
 
 /* end */
 
-int main() {
+void measureExecutionTime() {
+    using std::chrono::high_resolution_clock;
+    using std::chrono::duration_cast;
+    using std::chrono::duration;
+    using std::chrono::milliseconds;
+
+    auto t1 = high_resolution_clock::now();
+
     for (string line; getline(cin, line);) {
         try {
             const string& rawEquation = line;
 
-            string spacelessEquation = removeSpaces(rawEquation);
-            vector<string> tokens = tokenize(spacelessEquation);
+            string spacelessEquation = removeSpaces(rawEquation); // O(len(str))
+            vector<string> tokens = tokenize(spacelessEquation); // O(len(str))
 
-            validateEquation(tokens);
+            validateEquation(tokens); // O(num(tokens) ~> O(len(str))
 
-            tokens = convertRomanTokensToInts(tokens);
+            tokens = convertRomanTokensToInts(tokens); // O(num(tokens)/2) + O((num(tokens)/2 + 1) * X)
+
+            vector<string> postfix = infixToPostfix(tokens);
+            cout << intToRoman(evaluatePostfix(postfix)) << endl;
+
+
+// Старое решение
+//            Node* root = postfixToBinaryExpressionTree(postfix);
+//            cout << intToRoman(root->evaluate()) << endl;
+        } catch (exception& ex) {
+            cout << "error: " + string(ex.what()) << endl;
+        }
+    }
+
+    auto t2 = high_resolution_clock::now();
+
+    /* Getting number of milliseconds as a double. */
+    duration<double, std::milli> ms_double = t2 - t1;
+
+    std::cout << ms_double.count() << std::endl;
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    /*
+    for (string line; getline(cin, line);) {
+        try {
+            const string& rawEquation = line;
+
+            string spacelessEquation = removeSpaces(rawEquation); // O(len(str))
+            vector<string> tokens = tokenize(spacelessEquation); // O(len(str))
+
+            validateEquation(tokens); // O(num(tokens) ~> O(len(str))
+
+            tokens = convertRomanTokensToInts(tokens); // O(num(tokens)/2) + O((num(tokens)/2 + 1) * X)
 
             vector<string> postfix = infixToPostfix(tokens);
 
@@ -416,6 +495,9 @@ int main() {
             cout << "error: " + string(ex.what()) << endl;
         }
     }
+    */
+
+    measureExecutionTime();
 
     return 0;
 }
